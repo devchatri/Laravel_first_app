@@ -11,11 +11,34 @@ class EtudiantController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        $etudiants = auth()->user()->etudiants;
-  
-        return view('etudiants.index', compact('etudiants'));
+{
+    $user = auth()->user();
+
+    if ($user->role == "admin") {
+        // If the user is an admin, fetch only their associated students
+        $etudiants = $user->etudiants;
+    } else {
+        // If the user is not an admin, check if they have a student record
+        $etudiant = Etudiant::where('user_id', $user->id)->first();
+
+        if (!$etudiant) {
+            // If the user doesn't have a student record, create one with default values
+            $defaultAttributes = [
+                'nom' => 'Default',
+                'prenom' => 'Student',
+                'sexe' => 'Male', // You can change this to the default value you want
+                'filiere_id' => 1, // Change this to the default filiere_id
+                'user_id' => $user->id,
+            ];
+
+            $etudiant = Etudiant::create($defaultAttributes);
+        }
+
+        $etudiants = collect([$etudiant]); // Convert the array to a collection
     }
+
+    return view('etudiants.index', compact('etudiants'));
+}
   
     /**
      * Show the form for creating a new resource.
@@ -31,8 +54,6 @@ class EtudiantController extends Controller
     public function store(Request $request)
     {
         $request->merge(['user_id' => auth()->user()->id]);
-
-    // Créez l'étudiant avec les données du formulaire
     Etudiant::create($request->all());
 
     return redirect()->route('etudiants.index')->with('success', 'Etudiant added successfully');

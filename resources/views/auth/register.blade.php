@@ -53,6 +53,15 @@
                       <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
                   </div>
+                  <div class="form-group row">
+                    <label for="role" class="col-md-4 col-form-label text-md-right">{{ __('Role') }}</label>
+                    <div class="col-md-6">
+                        <select id="role" class="form-control" name="role">
+                            <option value="etudiant">Student</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                </div>
                 </div>
                 <button type="submit" class="btn btn-primary btn-user btn-block">Register Account</button>
               </form>
